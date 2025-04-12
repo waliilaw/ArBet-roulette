@@ -4,6 +4,13 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+@font-face {
+  font-family: 'Pixelated';
+  src: url('/fonts/pixelated.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;
@@ -35,6 +42,10 @@
     --ring: 212.7 26.8% 83.9%;
     
     --radius: 0.5rem;
+
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 15, 23, 42;
   }
  
   * {
@@ -56,6 +67,14 @@
     background-size: 60px 60px;
     background-position: 0 0, 30px 30px;
     image-rendering: pixelated;
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))
+    );
+    min-height: 100vh;
+    background-attachment: fixed;
   }
 }
 
@@ -70,11 +89,19 @@
   .pixel-button {
     @apply px-4 py-2 font-pixel text-white border-b-4 border-r-4 border-gray-900 active:border-b-2 active:border-r-2 active:translate-x-[2px] active:translate-y-[2px] transition-all duration-100;
     image-rendering: pixelated;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+  }
+  
+  .pixel-button:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
   }
   
   .pixel-input {
     @apply px-3 py-2 bg-gray-800 border-2 border-gray-700 shadow-inner text-white font-pixel focus:outline-none focus:border-blue-500;
     image-rendering: pixelated;
+    font-family: 'Pixelated', monospace;
+    padding: 8px;
   }
   
   .pixel-panel {
@@ -88,5 +115,49 @@
     image-rendering: pixelated;
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
     border: 3px solid;
+  }
+
+  .font-pixel {
+    font-family: 'Pixelated', monospace;
+    letter-spacing: 1px;
+  }
+
+  .bg-roulette-red {
+    background-color: #E81416;
+  }
+
+  .bg-roulette-black {
+    background-color: #1A1A1A;
+  }
+
+  .text-shadow {
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  /* Pixelated background pattern */
+  .bg-pixel-pattern {
+    background-image: 
+      linear-gradient(to right, rgba(30, 41, 59, 0.8) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30, 41, 59, 0.8) 1px, transparent 1px);
+    background-size: 8px 8px;
+    background-attachment: fixed;
+  }
+
+  .pixelated-container {
+    position: relative;
+  }
+
+  .pixelated-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAkSURBVHgBY2RgYPgPxAwMjET8/z/DfwYmBhIBIxODFDBSQgEAXUQCARvBF7cAAAAASUVORK5CYII=");
+    background-repeat: repeat;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 1;
   }
 } 

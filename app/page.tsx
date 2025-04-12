@@ -7,12 +7,15 @@ export default function Home() {
       background: "#0e0b1a",
       backgroundImage: `
         linear-gradient(45deg, rgba(30,20,60,0.15) 25%, transparent 25%, transparent 75%, rgba(30,20,60,0.15) 75%),
-        linear-gradient(45deg, rgba(30,20,60,0.15) 25%, transparent 25%, transparent 75%, rgba(30,20,60,0.15) 75%)
+        linear-gradient(45deg, rgba(30,20,60,0.15) 25%, transparent 25%, transparent 75%, rgba(30,20,60,0.15) 75%),
+        linear-gradient(45deg, rgba(255, 0, 0, 0.05) 25%, transparent 25%, transparent 75%, rgba(255, 0, 0, 0.05) 75%),
+        linear-gradient(45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.1) 75%)
       `,
-      backgroundSize: "60px 60px",
-      backgroundPosition: "0 0, 30px 30px",
+      backgroundSize: "30px 30px",
+      backgroundPosition: "0 0, 15px 15px, 7px 7px, 22px 22px",
       position: "relative",
       overflow: "hidden",
+      boxShadow: "inset 0 0 30px rgba(255, 0, 0, 0.2)",
     }}>
       <h1 className="text-4xl font-bold text-white mb-8 font-pixel" style={{
         textShadow: "3px 3px 0 #000",

@@ -64,8 +64,13 @@ export default function RouletteGame() {
     isBraveBrowser,
     walletError,
     connect,
-    disconnect
+    disconnect: originalDisconnect
   } = useArweaveWallet()
+
+  // Create a wrapper that returns void instead of boolean
+  const disconnect = async (): Promise<void> => {
+    await originalDisconnect();
+  }
 
   // Calculate total bet amount
   const totalBetAmount = bets.reduce((acc, bet) => acc + bet.amount, 0)
@@ -93,7 +98,7 @@ export default function RouletteGame() {
 
   // Add bet
   const addBet = useCallback(() => {
-    if (!betAmount || parseFloat(betAmount) <= 0) return;
+    if (!betAmount || parseFloat(betAmount) < 0) return;
     
     // Play bet sound
     playBetSound();
@@ -199,7 +204,7 @@ export default function RouletteGame() {
           betWon = getNumberColor(spinResult) === "black";
           break;
         case "even":
-          betWon = spinResult !== 0 && spinResult % 2 === 0;
+          betWon = spinResult % 2 === 0;
           break;
         case "odd":
           betWon = spinResult !== 0 && spinResult % 2 === 1;
@@ -254,43 +259,43 @@ export default function RouletteGame() {
     return (
       <div className="grid grid-cols-2 gap-2 mb-4">
         <Button 
-          className={`pixel-button ${currentBetType === 'red' ? 'bg-roulette-red' : 'bg-gray-800'}`}
+          className={`pixel-button ${currentBetType === 'red' ? 'bg-roulette-red border-2 border-red-900' : 'bg-gray-800 border-2 border-gray-700'} shadow-md`}
           onClick={() => setCurrentBetType('red')}
         >
           RED
         </Button>
         <Button 
-          className={`pixel-button ${currentBetType === 'black' ? 'bg-roulette-black' : 'bg-gray-800'}`}
+          className={`pixel-button ${currentBetType === 'black' ? 'bg-roulette-black border-2 border-gray-600' : 'bg-gray-800 border-2 border-gray-700'} shadow-md`}
           onClick={() => setCurrentBetType('black')}
         >
           BLACK
         </Button>
         <Button 
-          className={`pixel-button ${currentBetType === 'even' ? 'bg-blue-700' : 'bg-gray-800'}`}
+          className={`pixel-button ${currentBetType === 'even' ? 'bg-blue-700 border-2 border-blue-900' : 'bg-gray-800 border-2 border-gray-700'} shadow-md`}
           onClick={() => setCurrentBetType('even')}
         >
           EVEN
         </Button>
         <Button 
-          className={`pixel-button ${currentBetType === 'odd' ? 'bg-blue-700' : 'bg-gray-800'}`}
+          className={`pixel-button ${currentBetType === 'odd' ? 'bg-blue-700 border-2 border-blue-900' : 'bg-gray-800 border-2 border-gray-700'} shadow-md`}
           onClick={() => setCurrentBetType('odd')}
         >
           ODD
         </Button>
         <Button 
-          className={`pixel-button ${currentBetType === 'low' ? 'bg-purple-700' : 'bg-gray-800'}`}
+          className={`pixel-button ${currentBetType === 'low' ? 'bg-purple-700 border-2 border-purple-900' : 'bg-gray-800 border-2 border-gray-700'} shadow-md`}
           onClick={() => setCurrentBetType('low')}
         >
           1-18
         </Button>
         <Button 
-          className={`pixel-button ${currentBetType === 'high' ? 'bg-purple-700' : 'bg-gray-800'}`}
+          className={`pixel-button ${currentBetType === 'high' ? 'bg-purple-700 border-2 border-purple-900' : 'bg-gray-800 border-2 border-gray-700'} shadow-md`}
           onClick={() => setCurrentBetType('high')}
         >
           19-36
         </Button>
         <Button 
-          className={`pixel-button ${currentBetType === 'straight' ? 'bg-green-700' : 'bg-gray-800'} col-span-2`}
+          className={`pixel-button ${currentBetType === 'straight' ? 'bg-green-700 border-2 border-green-900' : 'bg-gray-800 border-2 border-gray-700'} col-span-2 shadow-md`}
           onClick={() => setCurrentBetType('straight')}
         >
           STRAIGHT (NUMBER)
@@ -299,11 +304,11 @@ export default function RouletteGame() {
           <div className="col-span-2 my-2">
             <Input
               type="number"
-              min=""
+              min="0"
               max="36"
               value={currentBetValue.toString()}
               onChange={(e) => setCurrentBetValue(parseInt(e.target.value) || 0)}
-              className="pixel-input"
+              className="pixel-input border-2 border-gray-600 bg-gray-950 text-white"
               placeholder="Enter number (0-36)"
             />
           </div>
@@ -313,7 +318,7 @@ export default function RouletteGame() {
   };
 
   return (
-    <div className="max-w-4xl w-full mx-auto flex flex-col items-center">
+    <div className="max-w-4xl w-full mx-auto flex flex-col items-center pixelated-container">
       {/* Wallet Section */}
       <div className="w-full mb-6">
         {!isWalletInstalled ? (
@@ -321,11 +326,11 @@ export default function RouletteGame() {
         ) : connected ? (
           <WalletDisplay address={address} balance={balance} disconnect={disconnect} />
         ) : (
-          <div className="pixel-panel p-4 bg-gray-900 mb-4 text-center">
+          <div className="pixel-panel p-4 bg-gray-900 mb-4 text-center border-4 border-blue-700 shadow-lg shadow-blue-900/50">
             <Button 
               onClick={handleConnectWallet}
               disabled={isConnecting}
-              className="w-full p-3 bg-blue-700 hover:bg-blue-600 text-white font-pixel pixel-button"
+              className="w-full p-3 bg-blue-700 hover:bg-blue-600 text-white font-pixel pixel-button border-b-4 border-blue-900"
             >
               {isConnecting ? "CONNECTING..." : "CONNECT WALLET"}
             </Button>
@@ -333,9 +338,9 @@ export default function RouletteGame() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full bg-gray-950 p-6 rounded-lg border-4 border-gray-800 shadow-xl shadow-purple-900/20 bg-pixel-pattern">
         {/* Roulette Wheel Section */}
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-gray-950 p-4 rounded-lg border-2 border-gray-800">
           <div className="relative">
             <Wheel
               mustStartSpinning={mustSpin}
@@ -373,14 +378,14 @@ export default function RouletteGame() {
 
           <div className="mt-4 flex justify-center">
             <Button
-              className="mr-4 bg-green-700 hover:bg-green-600 pixel-button"
+              className="mr-4 bg-green-700 hover:bg-green-600 pixel-button border-b-4 border-green-900"
               onClick={startSpin}
               disabled={gameState === "spinning" || bets.length === 0 || transactionLoading}
             >
               {transactionLoading ? "PROCESSING..." : "SPIN"}
             </Button>
             <Button
-              className="bg-blue-700 hover:bg-blue-600 pixel-button"
+              className="bg-blue-700 hover:bg-blue-600 pixel-button border-b-4 border-blue-900"
               onClick={resetGame}
               disabled={gameState === "spinning" || transactionLoading}
             >
@@ -393,7 +398,7 @@ export default function RouletteGame() {
           
           {/* Result Display */}
           {spinResult > 0 && gameState !== "spinning" && (
-            <div className="mt-4 pixel-panel p-2 bg-gray-900 text-center">
+            <div className="mt-4 pixel-panel p-2 bg-gray-900 text-center border-2 border-yellow-600">
               <span className="font-pixel text-yellow-400">RESULT: </span>
               <span 
                 className={`font-pixel font-bold ${
@@ -408,8 +413,8 @@ export default function RouletteGame() {
         </div>
         
         {/* Betting Panel */}
-        <div className="pixel-panel p-4 bg-gray-900">
-          <h2 className="text-2xl font-pixel text-yellow-400 mb-6 text-center">PLACE YOUR BETS</h2>
+        <div className="pixel-panel p-4 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg border-2 border-gray-700 shadow-inner shadow-black/50">
+          <h2 className="text-2xl font-pixel text-yellow-400 mb-6 text-center text-shadow">PLACE YOUR BETS</h2>
           
           {/* Bet Amount Input */}
           <div className="mb-6">
@@ -419,17 +424,17 @@ export default function RouletteGame() {
                 id="betAmount"
                 type="number"
                 step="0.01"
-                min="0.01"
+                min="0"
                 value={betAmount}
                 onChange={(e) => setBetAmount(e.target.value)}
-                className="pixel-input flex-1 mr-2"
+                className="pixel-input flex-1 mr-2 border-2 border-gray-600 bg-gray-950 text-white"
                 placeholder="Enter bet amount"
                 disabled={gameState === "spinning"}
               />
               <Button
                 onClick={addBet}
-                disabled={!betAmount || parseFloat(betAmount) <= 0 || gameState === "spinning"}
-                className="bg-green-700 hover:bg-green-600 pixel-button"
+                disabled={!betAmount || parseFloat(betAmount) < 0 || gameState === "spinning"}
+                className="bg-green-700 hover:bg-green-600 pixel-button border-b-4 border-green-900"
               >
                 ADD BET
               </Button>
@@ -442,13 +447,13 @@ export default function RouletteGame() {
           {/* Bets List */}
           <div className="mt-4">
             <h3 className="font-pixel text-white mb-2">YOUR BETS:</h3>
-            <div className="max-h-48 overflow-y-auto bg-gray-800 border-2 border-gray-700 p-2">
+            <div className="max-h-48 overflow-y-auto bg-gray-800 border-2 border-gray-700 p-2 shadow-inner shadow-black/40">
               {bets.length === 0 ? (
                 <p className="text-gray-400 font-pixel text-xs text-center p-2">No bets placed</p>
               ) : (
                 <ul className="space-y-2">
                   {bets.map((bet, index) => (
-                    <li key={index} className="flex justify-between items-center bg-gray-700 p-2 rounded">
+                    <li key={index} className="flex justify-between items-center bg-gray-700 p-2 rounded border border-gray-600">
                       <div className="font-pixel text-xs">
                         <span className="text-yellow-400">{bet.type.toUpperCase()}: </span>
                         <span className="text-white">
@@ -466,7 +471,7 @@ export default function RouletteGame() {
                         size="sm"
                         onClick={() => removeBet(index)}
                         disabled={gameState === "spinning"}
-                        className="bg-red-700 hover:bg-red-600 text-xs h-6 w-6 p-0"
+                        className="bg-red-700 hover:bg-red-600 text-xs h-6 w-6 p-0 border border-red-900"
                       >
                         X
                       </Button>
@@ -477,7 +482,7 @@ export default function RouletteGame() {
             </div>
             
             {/* Total Bet Amount */}
-            <div className="mt-4 bg-gray-800 border-2 border-gray-700 p-2 rounded flex justify-between items-center">
+            <div className="mt-4 bg-gray-800 border-2 border-gray-700 p-2 rounded flex justify-between items-center shadow-inner shadow-black/30">
               <span className="font-pixel text-yellow-400">TOTAL BET:</span>
               <span className="font-pixel text-white">{formatArAmount(totalBetAmount)} AR</span>
             </div>
