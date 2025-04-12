@@ -14,33 +14,26 @@ const arweave = Arweave.init({
 // Contract ID for the roulette game
 const ROULETTE_CONTRACT_ID = process.env.NEXT_PUBLIC_ROULETTE_CONTRACT_ID || 'your-default-contract-id';
 
-// Add Wander wallet type definition
-declare global {
-  interface Transaction {
-    id?: string;
-    owner?: string;
-    tags: { name: string; value: string }[];
-    target?: string;
-    quantity?: string;
-    reward?: string;
-    data?: string | Uint8Array;
-    addTag: (name: string, value: string) => void;
-    [key: string]: any; // Allow for other properties from Arweave transactions
-  }
+// Define transaction interface
+interface Transaction {
+  id?: string;
+  owner?: string;
+  tags: { name: string; value: string }[];
+  target?: string;
+  quantity?: string;
+  reward?: string;
+  data?: string | Uint8Array;
+  addTag: (name: string, value: string) => void;
+  [key: string]: any; // Allow for other properties from Arweave transactions
+}
 
-  // Define wallet interface type to avoid duplication
-  interface ArweaveWalletInterface {
-    connect: (permissions: string[]) => Promise<void>;
-    disconnect: () => Promise<void>;
-    getActiveAddress: () => Promise<string>;
-    sign: (transaction: Transaction) => Promise<Transaction>;
-    dispatch: (transaction: Transaction) => Promise<{ id: string }>;
-  }
-
-  interface Window {
-    wander?: ArweaveWalletInterface;
-    arweaveWallet?: ArweaveWalletInterface;
-  }
+// Define wallet interface type to avoid duplication
+interface ArweaveWalletInterface {
+  connect: (permissions: string[]) => Promise<void>;
+  disconnect: () => Promise<void>;
+  getActiveAddress: () => Promise<string>;
+  sign: (transaction: Transaction) => Promise<Transaction>;
+  dispatch: (transaction: Transaction) => Promise<{ id: string }>;
 }
 
 /**
@@ -48,7 +41,10 @@ declare global {
  * @returns Boolean indicating if any compatible wallet is available
  */
 export function isWanderWalletInstalled(): boolean {
-  return typeof window !== 'undefined' && (!!window.wander || !!window.arweaveWallet);
+  if (typeof window === 'undefined') return false;
+  // Use any type to bypass TypeScript type checking
+  const win = window as any;
+  return !!win.wander || !!win.arweaveWallet;
 }
 
 /**
@@ -57,7 +53,9 @@ export function isWanderWalletInstalled(): boolean {
  */
 function getWalletInterface() {
   if (typeof window === 'undefined') return null;
-  return window.wander || window.arweaveWallet || null;
+  // Use any type to bypass TypeScript type checking
+  const win = window as any;
+  return win.wander || win.arweaveWallet || null;
 }
 
 /**

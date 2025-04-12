@@ -61,16 +61,11 @@ export default function RouletteGame() {
     balance, 
     isConnecting, 
     isWalletInstalled,
-    isBraveBrowser,
     walletError,
-    connect,
-    disconnect: originalDisconnect
+    handleConnect,
+    handleDisconnect,
+    refreshBalance
   } = useArweaveWallet()
-
-  // Create a wrapper that returns void instead of boolean
-  const disconnect = async (): Promise<void> => {
-    await originalDisconnect();
-  }
 
   // Calculate total bet amount
   const totalBetAmount = bets.reduce((acc, bet) => acc + bet.amount, 0)
@@ -79,11 +74,11 @@ export default function RouletteGame() {
   const handleConnectWallet = useCallback(async () => {
     if (isConnecting) return;
     try {
-      await connect();
+      await handleConnect();
     } catch (error) {
       console.error("Error connecting wallet:", error);
     }
-  }, [connect, isConnecting])
+  }, [handleConnect, isConnecting])
 
   // Reset game to initial state
   const resetGame = useCallback(() => {
@@ -322,9 +317,9 @@ export default function RouletteGame() {
       {/* Wallet Section */}
       <div className="w-full mb-6">
         {!isWalletInstalled ? (
-          <WalletNotFound onConnectClick={handleConnectWallet} isBrave={isBraveBrowser} />
+          <WalletNotFound onConnectClick={handleConnectWallet} />
         ) : connected ? (
-          <WalletDisplay address={address} balance={balance} disconnect={disconnect} />
+          <WalletDisplay address={address} balance={balance} handleDisconnect={handleDisconnect} />
         ) : (
           <div className="pixel-panel p-4 bg-gray-900 mb-4 text-center border-4 border-blue-700 shadow-lg shadow-blue-900/50">
             <Button 

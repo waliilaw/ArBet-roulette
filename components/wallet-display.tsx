@@ -8,16 +8,16 @@ import { formatArAmount } from '@/lib/utils'
 interface WalletDisplayProps {
   address: string;
   balance: string;
-  disconnect: () => Promise<void>;
+  handleDisconnect: () => Promise<void>;
 }
 
-export function WalletDisplay({ address, balance, disconnect }: WalletDisplayProps) {
+export function WalletDisplay({ address, balance, handleDisconnect }: WalletDisplayProps) {
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
-  const handleDisconnect = async () => {
+  const handleDisconnectClick = async () => {
     try {
       setIsDisconnecting(true);
-      await disconnect();
+      await handleDisconnect();
     } catch (error) {
       console.error('Error disconnecting wallet:', error);
     } finally {
@@ -41,7 +41,7 @@ export function WalletDisplay({ address, balance, disconnect }: WalletDisplayPro
       <Button
         variant="destructive"
         size="sm"
-        onClick={handleDisconnect}
+        onClick={handleDisconnectClick}
         disabled={isDisconnecting}
         className="font-pixel text-xs py-1 px-2 h-auto bg-red-700 hover:bg-red-600 pixel-button"
       >
