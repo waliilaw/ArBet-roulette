@@ -1,153 +1,133 @@
 -- Roulette Game Smart Contract for Arweave AO
 
--- Initialize the state if needed
-if not Handlers.initState then
-  Handlers.initState = function(state)
-    return {
-      games = {},
-      wallets = {},
-      houseEdge = 0.03,  -- 3% house edge
-      contractBalance = 0,
-      minBet = 0.01,     -- Minimum bet in AR
-      maxBet = 10,       -- Maximum bet in AR
-      version = "1.0.0"
-    }
-  end
+-- Initialize state if needed
+if not Handlers.utils then
+  Handlers.utils = {}
 end
 
--- Generate a random roulette result (0-36)
-function generateRandomNumber()
-  -- In a real contract, this would use AO's verifiable randomness
-  -- For demo, we're using Lua's math.random with a timestamp seed
-  math.randomseed(os.time())
-  return math.random(0, 36)
+if not Handlers.games then
+  Handlers.games = {}
 end
 
--- Handle bet placement
-Handlers.placeBet = function(state, action)
-  local from = action.From
-  local amount = tonumber(action.amount) or 0
-  local betType = action.betType
-  local betValue = action.betValue
-  local timestamp = action.timestamp or os.time()
-  local gameId = ao.id .. "-" .. from .. "-" .. timestamp
-  
-  -- Validate the bet
-  if amount < state.minBet then
-    return { result = "error", message = "Bet below minimum amount" }
-  end
-  
-  if amount > state.maxBet then
-    return { result = "error", message = "Bet above maximum amount" }
-  end
-  
-  -- Generate the result
-  local result = generateRandomNumber()
-  
-  -- Store the game
-  state.games[gameId] = {
-    player = from,
-    amount = amount,
-    betType = betType,
-    betValue = betValue,
-    result = result,
-    timestamp = timestamp,
-    status = "played"
-  }
-  
-  -- Initialize player wallet if needed
-  if not state.wallets[from] then
-    state.wallets[from] = { balance = 0, bets = 0, wins = 0 }
-  end
-  
-  -- Update player stats
-  state.wallets[from].bets = state.wallets[from].bets + 1
-  
-  -- Add to contract balance
-  state.contractBalance = state.contractBalance + amount
-  
-  -- Return the game result to be processed client-side
-  return {
-    result = "success",
-    gameId = gameId,
-    playerAddress = from,
-    betAmount = amount,
-    rouletteResult = result
-  }
+-- Utils functions
+Handlers.utils.hash = function(data)
+  return ao.sha256(data)
 end
 
--- Handle claiming winnings
-Handlers.claimWinnings = function(state, action)
-  local from = action.From
-  local gameId = action.gameId
-  local result = tonumber(action.result)
-  local claimAmount = tonumber(action.amount) or 0
-  
-  -- Validate the claim
-  if not state.games[gameId] then
-    return { result = "error", message = "Game not found" }
-  end
-  
-  local game = state.games[gameId]
-  
-  if game.player ~= from then
-    return { result = "error", message = "Not the player of this game" }
-  end
-  
-  if game.status ~= "played" then
-    return { result = "error", message = "Game already processed" }
-  end
-  
-  if game.result ~= result then
-    return { result = "error", message = "Result mismatch" }
-  end
-  
-  -- Mark the game as claimed
-  state.games[gameId].status = "claimed"
-  
-  -- Update player stats
-  state.wallets[from].wins = state.wallets[from].wins + 1
-  state.wallets[from].balance = state.wallets[from].balance + claimAmount
-  
-  -- Deduct from contract balance
-  state.contractBalance = state.contractBalance - claimAmount
-  
-  -- Return success
-  return {
-    result = "success",
-    gameId = gameId,
-    playerAddress = from,
-    winAmount = claimAmount
-  }
+Handlers.utils.generateSeed = function()
+  local timestamp = os.time()
+  local nonce = math.random(1, 10000000)
+  local processId = ao.id
+  local blockHeight = ao.block.height
+  local seedStr = tostring(timestamp) .. tostring(nonce) .. processId .. tostring(blockHeight)
+  return Handlers.utils.hash(seedStr)
 end
 
--- Get game details
-Handlers.getGame = function(state, action)
-  local gameId = action.gameId
+-- Generate a random roulette number (0-36)
+Handlers.utils.generateRandomRouletteNumber = function(seed)
+  local seed = seed or Handlers.utils.generateSeed()
+  local hashInput = seed
+  local hash = Handlers.utils.hash(hashInput)
   
-  if not state.games[gameId] then
-    return { result = "error", message = "Game not found" }
+  -- Convert first 4 bytes of hash to a number
+  local num = 0
+  for i = 1, 4 do
+    num = num * 256 + string.byte(hash, i, i)
   end
   
-  return { 
-    result = "success",
-    game = state.games[gameId]
-  }
+  -- Get a number between 0 and 36
+  return num % 37
 end
 
--- Get player stats
-Handlers.getPlayerStats = function(state, action)
-  local address = action.address
+-- Handler for GetRandomness action
+Handlers.getRandomness = function(msg)
+  if msg.Tags.Action ~= "GetRandomness" then return end
   
-  if not state.wallets[address] then
-    return { 
-      result = "success",
-      stats = { balance = 0, bets = 0, wins = 0 }
-    }
+  -- Generate a seed based on current block and message info
+  local seed = Handlers.utils.generateSeed()
+  
+  -- Generate random roulette number
+  local rouletteNumber = Handlers.utils.generateRandomRouletteNumber(seed)
+  
+  -- Store the game result in state for verification
+  local gameId = msg.Tags.GameId or tostring(os.time()) .. "_" .. tostring(math.random(1000000))
+  
+  Handlers.games[gameId] = {
+    number = rouletteNumber,
+    timestamp = os.time(),
+    from = msg.From
+  }
+  
+  -- Send the number back to the sender
+  ao.send({
+    Target = msg.From,
+    Data = json.encode({
+      success = true,
+      gameId = gameId,
+      number = rouletteNumber
+    })
+  })
+end
+
+-- Handler for verifying game results
+Handlers.verifyGameResult = function(msg)
+  if msg.Tags.Action ~= "VerifyGameResult" then return end
+  
+  local gameId = msg.Tags.GameId
+  
+  -- Check if we have the game in state
+  if not Handlers.games[gameId] then
+    return ao.send({
+      Target = msg.From,
+      Data = json.encode({
+        success = false,
+        error = "Game not found"
+      })
+    })
   end
   
-  return { 
-    result = "success",
-    stats = state.wallets[address]
-  }
+  local game = Handlers.games[gameId]
+  
+  -- Parse the message data to get the result to verify
+  local data = json.decode(msg.Data)
+  local resultToVerify = data.result
+  
+  -- Check if the result matches the stored number
+  local isValid = (resultToVerify == game.number)
+  
+  -- Send verification result
+  ao.send({
+    Target = msg.From,
+    Data = json.encode({
+      success = true,
+      gameId = gameId,
+      isValid = isValid
+    })
+  })
+end
+
+-- Register message handlers
+Handlers.add("getRandomness", Handlers.getRandomness)
+Handlers.add("verifyGameResult", Handlers.verifyGameResult)
+
+-- Process initialization message
+function handle(msg)
+  -- Log the incoming message
+  ao.log("Received message: " .. json.encode(msg))
+  
+  -- Handle different message types
+  if msg.Tags.Action == "GetRandomness" then
+    Handlers.getRandomness(msg)
+  elseif msg.Tags.Action == "VerifyGameResult" then
+    Handlers.verifyGameResult(msg)
+  else
+    -- Unknown action
+    ao.send({
+      Target = msg.From,
+      Data = json.encode({
+        success = false,
+        error = "Unknown action"
+      })
+    })
+  end
 end 
