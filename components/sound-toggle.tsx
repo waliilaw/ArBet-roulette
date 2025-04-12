@@ -14,11 +14,25 @@ export function useSoundEffects(enabled: boolean = true) {
   // Initialize sound effects
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Helper function to safely load audio
+      const safeLoadAudio = (path: string) => {
+        try {
+          const audio = new Audio(path)
+          audio.addEventListener('error', (e) => {
+            console.warn(`Could not load sound file: ${path}`, e)
+          })
+          return audio
+        } catch (err) {
+          console.warn(`Error creating audio element for ${path}:`, err)
+          return null
+        }
+      }
+
       // Create audio elements but don't play them yet
-      setSpinSound(new Audio("/sounds/spin.mp3"))
-      setWinSound(new Audio("/sounds/win.mp3"))
-      setLoseSound(new Audio("/sounds/lose.mp3"))
-      setBetSound(new Audio("/sounds/bet.mp3"))
+      setSpinSound(safeLoadAudio("/sounds/spin.mp3"))
+      setWinSound(safeLoadAudio("/sounds/win.mp3"))
+      setLoseSound(safeLoadAudio("/sounds/lose.mp3"))
+      setBetSound(safeLoadAudio("/sounds/bet.mp3"))
     }
     
     // Cleanup function
@@ -30,34 +44,32 @@ export function useSoundEffects(enabled: boolean = true) {
     }
   }, [])
 
-  // Sound player functions
-  const playSpinSound = useCallback(() => {
-    if (spinSound && enabled) {
-      spinSound.currentTime = 0
-      spinSound.play().catch(err => console.error("Error playing spin sound:", err))
+  // Sound player functions with safe play
+  const safePlay = useCallback((sound: HTMLAudioElement | null) => {
+    if (sound && enabled) {
+      sound.currentTime = 0
+      sound.play().catch(err => {
+        // Silently fail if browser prevents autoplay
+        console.warn("Error playing sound:", err)
+      })
     }
-  }, [spinSound, enabled])
+  }, [enabled])
+
+  const playSpinSound = useCallback(() => {
+    safePlay(spinSound)
+  }, [spinSound, safePlay])
 
   const playWinSound = useCallback(() => {
-    if (winSound && enabled) {
-      winSound.currentTime = 0
-      winSound.play().catch(err => console.error("Error playing win sound:", err))
-    }
-  }, [winSound, enabled])
+    safePlay(winSound)
+  }, [winSound, safePlay])
 
   const playLoseSound = useCallback(() => {
-    if (loseSound && enabled) {
-      loseSound.currentTime = 0
-      loseSound.play().catch(err => console.error("Error playing lose sound:", err))
-    }
-  }, [loseSound, enabled])
+    safePlay(loseSound)
+  }, [loseSound, safePlay])
 
   const playBetSound = useCallback(() => {
-    if (betSound && enabled) {
-      betSound.currentTime = 0
-      betSound.play().catch(err => console.error("Error playing bet sound:", err))
-    }
-  }, [betSound, enabled])
+    safePlay(betSound)
+  }, [betSound, safePlay])
 
   return {
     playSpinSound,

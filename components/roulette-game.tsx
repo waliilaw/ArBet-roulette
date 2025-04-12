@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Wheel } from 'react-custom-roulette'
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,6 +12,12 @@ import { SoundToggle, useSoundEffects } from "@/components/sound-toggle"
 import { generateRouletteResult } from "@/lib/ao-randomness"
 import { placeBet, claimWinnings, fetchArweaveBalance } from "@/lib/arweave-integration"
 import { ROULETTE_NUMBERS, getNumberColor, formatArAmount, calculateBetPayout } from "@/lib/utils"
+
+// Dynamically import the Wheel component with SSR disabled
+const Wheel = dynamic(
+  () => import('react-custom-roulette').then((mod) => mod.Wheel),
+  { ssr: false }
+)
 
 // Game states
 type GameState = "idle" | "spinning" | "won" | "lost"

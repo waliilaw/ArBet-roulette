@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"app/page.tsx -> @/components/roulette-game\":{\"id\":\"app/page.tsx -> @/components/roulette-game\",\"files\":[\"static/chunks/_app-pages-browser_components_roulette-game_tsx.js\"]},\"components/roulette-game.tsx -> react-custom-roulette\":{\"id\":\"components/roulette-game.tsx -> react-custom-roulette\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_react-custom-roulette_dist_bundle_js.js\"]}}"
