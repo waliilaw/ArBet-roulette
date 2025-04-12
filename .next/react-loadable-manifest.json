@@ -1,15 +1,14 @@
 {
   "app/page.tsx -> @/components/roulette-game": {
-    "id": 9386,
+    "id": "app/page.tsx -> @/components/roulette-game",
     "files": [
-      "static/chunks/500.cacf8962da9e3858.js",
-      "static/chunks/386.63a9ff0b82b2e363.js"
+      "static/chunks/_app-pages-browser_components_roulette-game_tsx.js"
     ]
   },
   "components/roulette-game.tsx -> react-custom-roulette": {
-    "id": 283,
+    "id": "components/roulette-game.tsx -> react-custom-roulette",
     "files": [
-      "static/chunks/283.c2fb3f6f011903d8.js"
+      "static/chunks/_app-pages-browser_node_modules_react-custom-roulette_dist_bundle_js.js"
     ]
   }
 }
