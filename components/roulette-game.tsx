@@ -299,7 +299,7 @@ export default function RouletteGame() {
           <div className="col-span-2 my-2">
             <Input
               type="number"
-              min="0"
+              min="-1"
               max="36"
               value={currentBetValue.toString()}
               onChange={(e) => setCurrentBetValue(parseInt(e.target.value) || 0)}
