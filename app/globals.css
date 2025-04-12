@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    
+    --radius: 0.5rem;
+  }
+ 
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: none;
+    image-rendering: pixelated;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Press Start 2P', monospace;
+    background-image: 
+      linear-gradient(45deg, rgba(30, 20, 60, 0.15) 25%, transparent 25%, transparent 75%, rgba(30, 20, 60, 0.15) 75%),
+      linear-gradient(45deg, rgba(30, 20, 60, 0.15) 25%, transparent 25%, transparent 75%, rgba(30, 20, 60, 0.15) 75%);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+    image-rendering: pixelated;
+  }
+}
+
+/* Pixelated UI styles */
+@layer components {
+  .pixel-border {
+    @apply border-2 border-gray-800 shadow-md;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+    image-rendering: pixelated;
+  }
+  
+  .pixel-button {
+    @apply px-4 py-2 font-pixel text-white border-b-4 border-r-4 border-gray-900 active:border-b-2 active:border-r-2 active:translate-x-[2px] active:translate-y-[2px] transition-all duration-100;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-input {
+    @apply px-3 py-2 bg-gray-800 border-2 border-gray-700 shadow-inner text-white font-pixel focus:outline-none focus:border-blue-500;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-panel {
+    @apply bg-gray-800 border-2 border-gray-700 shadow-md p-4;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+    image-rendering: pixelated;
+  }
+  
+  .pixelated-toast {
+    font-family: 'Press Start 2P', monospace;
+    image-rendering: pixelated;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+    border: 3px solid;
+  }
+} 

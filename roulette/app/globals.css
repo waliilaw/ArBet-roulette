@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 14, 11, 26;
+  --background-end-rgb: 20, 15, 40;
+}
+
+html {
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
+  image-rendering: pixelated;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  background-image: 
+    linear-gradient(45deg, rgba(30, 20, 60, 0.15) 25%, transparent 25%, transparent 75%, rgba(30, 20, 60, 0.15) 75%),
+    linear-gradient(45deg, rgba(30, 20, 60, 0.15) 25%, transparent 25%, transparent 75%, rgba(30, 20, 60, 0.15) 75%);
+  background-size: 60px 60px;
+  background-position: 0 0, 30px 30px;
+  image-rendering: pixelated;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Pixelated UI styles */
+@layer components {
+  .pixel-border {
+    @apply border-2 border-gray-800 shadow-md;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+    image-rendering: pixelated;
+  }
+  
+  .pixel-button {
+    @apply px-4 py-2 font-pixel text-white border-b-4 border-r-4 border-gray-900 active:border-b-2 active:border-r-2 active:translate-x-[2px] active:translate-y-[2px] transition-all duration-100;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-input {
+    @apply px-3 py-2 bg-gray-800 border-2 border-gray-700 shadow-inner text-white font-pixel focus:outline-none focus:border-blue-500;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-panel {
+    @apply bg-gray-800 border-2 border-gray-700 shadow-md p-4;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+    image-rendering: pixelated;
+  }
+} 

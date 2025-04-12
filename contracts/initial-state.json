@@ -1,0 +1,9 @@
+{
+  "games": {},
+  "wallets": {},
+  "houseEdge": 0.03,
+  "contractBalance": 0,
+  "minBet": 0.01,
+  "maxBet": 10,
+  "version": "1.0.0"
+} 
